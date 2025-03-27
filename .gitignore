@@ -1,0 +1,14 @@
+# Ignore cache files
+*__pycache__
+*.DS_Store
+
+# Ignore any datafiles
+*.txt
+*.raw
+*output
+
+# Ignore any LaTeX supporting files
+*.aux
+*.log
+*.out
+*.synctex.gz
