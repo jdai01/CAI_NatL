@@ -1,0 +1,125 @@
+\section{Wikipedia Language Model}
+
+\section*{Motivation \cite{n-gram:ch3}}
+An n-gram is a sequence of n words and a a 2-gram (bigram) is a two-word sequence of words.
+Here, we use a 2-gram language model to solve this task.
+
+To predict the conditional probability of the next word in a bigram model, Markov assumption is applied:
+\begin{align}
+    P(w_n | w_{1:n-1}) \approx P(w_n | w_{n-1})
+\end{align}
+where
+\begin{itemize}
+    \item $P(w_n | w_{1:n-1})$: probability of word $w_n$ given all previous words $w_{1:n-1}$
+    \item $P(w_n | w_{n-1})$: probability of word $w_n$ given the previous word $w_{n-1}$
+\end{itemize}
+
+The maximum likelihood estimation is used to estimate probabilities:
+\begin{align}
+    P(w_n | w_{n-1}) %&= \frac{C(w_{n-1}, w_n)}{\sum_{w} C(w_{n-1}, w)}\\
+    &=\frac{C(w_{n-1}, w_n)}{C(w_{n-1})}
+\end{align}
+where
+\begin{itemize}
+    \item $C(w_{n-1}, w_n)$: count of bigram of $w_{n-1}$ and $w_n$ frequency
+    % \item $C(w_{n-1}, w)$: count of bigram of $w_{n-1}$ and word $w$ frequency
+    \item $C(w_{n-1})$: count of $w_{n-1}$ frequency
+\end{itemize}
+
+The probabilities are log to prevent numerical underflow and stored. 
+To return the original probability, the exp of the logprob is calculated.
+
+
+The perplexity of a language model on a test set is the inverse probability of the test set, normalized by the number of words and is used as an evaluation matric in this model.
+The higher the probability of the word sequence, the lower the perplexity, the better the model.
+It is defined as 
+\begin{align}
+    Perplexity(w) = \sqrt[N]{\prod_{i=1}^{N} \frac{1}{P(w_i | w_{i-1})}}
+    \label{eq:perplexity}
+\end{align}
+
+
+However, there lies a challenge in the trained model. 
+If a bigram exists in the test dataset and not in the train dataset, the probability of the bigram is zero, which affects the calculation of perplexity as we cannot divide by zero.
+Laplace smoothing is the simplest method to tackle this challenge.
+It is defined as 
+\begin{align}
+    P_{\text{Laplace}}(w_n | w_{n-1}) &=\frac{C(w_{n-1}, w_n) + 1}{C(w_{n-1}) + V}
+\end{align}
+where
+\begin{itemize}
+    \item $V$: number of unique in the corpus
+\end{itemize}
+
+To finetune the model, add-k smoothing is used (further improvement from Laplace smoothing) when optimising with validation dataset. 
+It is defined as 
+\begin{align}
+    P_{\text{Add-k}}(w_n | w_{n-1}) &=\frac{C(w_{n-1}, w_n) + k}{C(w_{n-1}) + kV}
+    \label{eq:additive_smoothing}
+\end{align}
+
+\hrule
+
+
+
+
+\subsection*{Data Preprocessing Steps}
+
+\paragraph{Text Tokenisation}
+The text data is broken into individual words (token), with punctuation, special characters and whitespace removed \cite{web:pre-processing}.
+
+\paragraph{Train-Validation-Test Data Split}
+This step is not performed here as the data provided is already split into training, validation and testing sets \cite{web:pre-processing}.
+
+% \paragraph{Create unique vocabulary list}
+% A list of unique words is created as it will be used for generating bigrams.
+
+
+
+\subsection*{Method and Experiment Design}
+
+\begin{enumerate}
+    \item Preprocess the data, i.e. text tokenisation
+    \item Generate 2-grams and count the frequency of occurance of two consecutive words ($w_1$ and $w_2$)
+    \item Calculate 2-gram probabilities (Equation \ref{eq:additive_smoothing}) with smoothing $k$
+    \item Evaluate the model by calculating perplexity (Equation \ref{eq:perplexity})
+    \item Optimise the model with validation data and a different $k$ value
+    \item Test the model with test data
+\end{enumerate}
+
+
+
+\paragraph{Hyperparameters}
+\begin{itemize}
+    \item $k$ (Equation \ref{eq:additive_smoothing}) is updated to finetune the model
+\end{itemize}
+
+\paragraph{Evaluation Metrics}
+\begin{itemize}
+    \item Perplexity
+\end{itemize}
+
+\paragraph{Observations}
+
+
+
+
+\paragraph{Drawbacks}
+\begin{itemize}
+    \item High smoothing can reduce model specificity.
+    With $\alpha = 100$, probabilities are spread more evenly, reducing the model ability to distinguish frequent and rare bigrams 
+    \item Limited context with 2-Gram model
+    % The bi-gram model only considers one previous word, missing longer dependencies in sentences
+    \item Low perplexity does not gurantee better text generation or predictive power in real world applications
+\end{itemize}
+
+
+
+\paragraph{Potential Improvements}
+\begin{itemize}
+    \item Use higher order N-Grams, e.g. 3-Gram or 4-Gram
+    \item  Experiment with different smoothing techniques 
+    \item  Apply backoff or interpolation
+    \item  Increase training data
+    % \item  Evaluate other metrics apart from perplexity
+\end{itemize}
