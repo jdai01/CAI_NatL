@@ -1,0 +1,51 @@
+\section{Zipf's Law}
+
+\subsection*{List of unique words sorted to their frequency in descending order}
+Shown in accompanying Jupyter Notebook.
+
+
+\subsection*{Discussion on findings}
+Zipf's Law states that in a large collection of words, the frequency of any word is inversely proportional to its rank:
+$$f \propto \frac{1}{r}$$
+where  
+\begin{itemize}
+    \item $f$: frequency of word  
+    \item $r$: rank of the word
+\end{itemize}
+
+This means that the most frequent word occurs twice as often as the second most frequent, three times as often as the third most frequent, and so on.
+
+With reference to the jungle book dataset, words that are short in length occur in higher frequencies compared to words with longer lengths. 
+For example, ``the'', ``and'', ``of'' occur in higher frequency compared to ``produce'', ``subscribe'', ``newsletter'' of lower frequency.
+\newline
+
+To verify Zipf's law on a textual corpus, using the jungle book dataset, chi-square goodness of fit test is performed.  
+\begin{itemize}
+    \item $H_0$: The observed frequencies are equal to the expected frequencies.  
+    \item $H_1$: The observed frequencies are not equal to the expected frequencies. 
+\end{itemize}
+
+\begin{align*}
+    \chi^2_{\text{statistics}} & = 19760.11496822835 \\
+    \chi^2_{\text{critical}} & = 5107.674219300448 \\
+    \chi^2_{\text{statistics}} & > \chi^2_{\text{critical}} & (\text{Reject } H_0)
+\end{align*}
+
+As the $H_0$ is rejected, this suggests that observed frequencies are not equal to the expected frequencies, and that Zipf's Law does not hold.
+
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{output/q1_plot.png}
+    \caption{
+        Linear and Log-Log Curves.\\
+        Observed line (blue) follows the frequency of words observed in the jungle book dataset.
+        Expected line (red) follows the theoretical word frequency according to Zipf's law.
+    }
+    \label{fig:linear_log_curve}
+\end{figure}
+
+With reference to Figure~\ref{fig:linear_log_curve}, there is a general downward trend of frequency compared to rank.
+The statistical analysis shows that the observed frequency is not equal to the expected frequency, suggests that the jungle book dataset contains words that does not follow Zipf's Law significantly.
+If Zipf's Law holds, the observed line (blue) should form a straight line with a slope close to -1, as depicted by the expected line (red) in Log-Log curve. 
+However, the observed line does not follow a slope close to -1 in Log-Log curve. 
