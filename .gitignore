@@ -12,3 +12,8 @@
 *.log
 *.out
 *.synctex.gz
+*.xml
+*.bbl
+*.bcf
+*.blg
+*.bbl-SAVE-ERROR
