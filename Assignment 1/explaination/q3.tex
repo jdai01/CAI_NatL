@@ -1,6 +1,6 @@
 \section{Wikipedia Language Model}
 
-\section*{Motivation \cite{n-gram:ch3}}
+\subsection{Motivation \cite{n-gram:ch3}}
 An n-gram is a sequence of n words and a a 2-gram (bigram) is a two-word sequence of words.
 Here, we use a 2-gram language model to solve this task.
 
@@ -26,17 +26,18 @@ where
     \item $C(w_{n-1})$: count of $w_{n-1}$ frequency
 \end{itemize}
 
-The probabilities are log to prevent numerical underflow and stored. 
-To return the original probability, the exp of the logprob is calculated.
 
 
 The perplexity of a language model on a test set is the inverse probability of the test set, normalized by the number of words and is used as an evaluation matric in this model.
-The higher the probability of the word sequence, the lower the perplexity, the better the model.
+The higher the probability of the word sequence, the lower the perplexity, the better the model as the model is more confident and accurate.
 It is defined as 
 \begin{align}
-    Perplexity(w) = \sqrt[N]{\prod_{i=1}^{N} \frac{1}{P(w_i | w_{i-1})}}
-    \label{eq:perplexity}
+    Perplexity(w) &= \sqrt[N]{\prod_{i=1}^{N} \frac{1}{P(w_i | w_{i-1})}} \label{eq:perplexity}\\
+    &= 2^{\frac{-\sum \log_2 P(w_i | w_{i-1})}{N}}  \label{eq:perplexity-log}
 \end{align}
+
+For equation \ref{eq:perplexity-log}, the probabilities are log to prevent numerical underflow and stored. 
+To return the original probability, the exp of the logprob is calculated.
 
 
 However, there lies a challenge in the trained model. 
@@ -82,11 +83,10 @@ This step is not performed here as the data provided is already split into train
     \item Preprocess the data, i.e. text tokenisation
     \item Generate 2-grams and count the frequency of occurance of two consecutive words ($w_1$ and $w_2$)
     \item Calculate 2-gram probabilities (Equation \ref{eq:additive_smoothing}) with smoothing $k$
-    \item Evaluate the model by calculating perplexity (Equation \ref{eq:perplexity})
+    \item Evaluate the model by calculating perplexity (Equation \ref{eq:perplexity-log})
     \item Optimise the model with validation data and a different $k$ value
-    \item Test the model with test data
+    \item Evaluate the perplexity with optimised model with test data
 \end{enumerate}
-
 
 
 \paragraph{Hyperparameters}
@@ -94,32 +94,129 @@ This step is not performed here as the data provided is already split into train
     \item $k$ (Equation \ref{eq:additive_smoothing}) is updated to finetune the model
 \end{itemize}
 
+
 \paragraph{Evaluation Metrics}
 \begin{itemize}
     \item Perplexity
 \end{itemize}
 
-\paragraph{Observations}
 
+\paragraph{Observations}
+\begin{figure}[h!]
+    \centering
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{output/bigram-perplexity.png}
+        \caption{Perplexity vs k-values}
+        \label{fig:bigram-perplexity}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{output/bigram-logsum.png}
+        \caption{Log-Sum Probability vs k-values}
+        \label{fig:bigram-logsum}
+    \end{subfigure}
+    
+    \caption{Bigram Model}
+    \label{fig:bigram}
+\end{figure}
+
+In Figure \ref{fig:bigram-perplexity}, the perplexity increases with increasing k-values whereas in Figure \ref{fig:bigram-logsum}, the log sum probabilities of $P(w_i | w_{i-1})$ decreases with increasing k-values.
+This observation corresponds well with Equation \ref{eq:perplexity} as the perplexity has an inverse relationship with the product of probabilities.
+With higher k-values, the probability product decreases (decreasing log sum probability), it makes individual probabilities less extreme (making each probability closer to a common probability) and smaller. 
+With the multiplication of probabilities, it makes the probability product (or log sum probability) decreases with increasing k value.
+
+As described earlier, perplexity is used to describe how confident and the model is accurate at predicting the the next word.
+We can see from Figure \ref{fig:bigram-perplexity} that at low k-value, the perplexity is lower than at a higher k-value. 
+This suggests that the model is better at predicting the next word with low k value compared to high k value. 
+
+As we are trying to achieve a perplexity of 1, which means the model is absolutely certain that it will always predict the correct word with probability of 1,
+the perplexity however still remains high with low k value at around 2000. 
+This suggests that the bigram model is essentially ``guessing'' the next word given the previous word. 
 
 
 
 \paragraph{Drawbacks}
 \begin{itemize}
     \item High smoothing can reduce model specificity.
-    With $\alpha = 100$, probabilities are spread more evenly, reducing the model ability to distinguish frequent and rare bigrams 
-    \item Limited context with 2-Gram model
+    With $\k = 100$, probabilities are spread more evenly, reducing the model ability to distinguish frequent and rare bigrams 
+    \item Limited context with Bigram model
     % The bi-gram model only considers one previous word, missing longer dependencies in sentences
-    \item Low perplexity does not gurantee better text generation or predictive power in real world applications
+    \item Low perplexity does not gurantee better text generation or predictive power in real world applications, as the model is trained based on train data. 
+    If the model is trained on customer support conversation corpus, it will perform poorly on a chemistry lecture corpus test data.
 \end{itemize}
 
 
 
 \paragraph{Potential Improvements}
 \begin{itemize}
-    \item Use higher order N-Grams, e.g. 3-Gram or 4-Gram
-    \item  Experiment with different smoothing techniques 
-    \item  Apply backoff or interpolation
-    \item  Increase training data
-    % \item  Evaluate other metrics apart from perplexity
+    \item Use higher order N-Grams, e.g. 3-Gram or 4-Gram (See Section \ref{subsec:improvement-ngrams})
+    \item Experiment with different smoothing techniques, i.e. apply backoff or interpolation (See Section \ref{sec:backoff} for backoff implementation)
+    \item Increase training data
 \end{itemize}
+
+
+\subsection{Improvement using higher order N-Grams}\label{subsec:improvement-ngrams}
+It is interesting to see that with increasing $n$ for n-gram models, the perplexity increases with the exception of unigram model (Figure \ref{fig:ngram_lowest_perplexity}). 
+As the $n$-size increases, the number of possible $n$-grams increases exponentially (Figure \ref{fig:ngram_unique_prefix_count}).
+This suggests that each specific sequence of `prefix' has a lower instance, which corresponds to its probability of occurance, in the training data. 
+This can cause the preplexity to increase tremendously with increasing $n$.
+With test data, many possible prefix sequence are not seen in the training data, which leads to the model assigning low probabilities to the unseen sequences, increasing the perplexity further.
+
+Increasing the $n$ in $n$-grams will eventually lead to a plateau of unique prefix and perplexity.
+This is due to the number of unique prefixes following Zipf's law, as it is forming `less common' combinations. 
+This plateauing effect is then seen in preplexity as there is not a further increase in number of unique prefixes. 
+
+It is worthy to note that 1-gram has a higher perplexity than 2-gram as they lack the context of preceding words, making it harder to predict the next word accurately, whereas bigrams consider the previous word, improving predictive accuracy and thus lowering perplexity.
+
+In Table \ref{ngram_generated_text}, you will find the generated text of trained $N$-Gram model given a specific text. 
+In practice, none of the generated text are coherent due to their high perplexity (despite 2-gram being the best model with the lowest perplexity).
+
+\begin{figure}[h!]
+    \centering
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{output/sorted_ngrams_unique_prefix_count.png}
+        \caption{Length of unique $n$-grams prefix}
+        \label{fig:ngram_unique_prefix_count}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{output/sorted_ngram_lowest_perplexity.png}
+        \caption{Perplexity}
+        \label{fig:ngram_lowest_perplexity}
+    \end{subfigure}
+    
+    \caption{N-Grams Model}
+    \label{fig:n-grams}
+\end{figure}
+
+\begin{table}[h]
+    \centering
+    \pgfplotstabletypeset[
+        col sep=comma,
+        columns={n,Generated Text}, % Specify columns you want to use
+        columns/n/.style={string type}, 
+        columns/Generated Text/.style={
+            string type, 
+            column type={>{\raggedright\ttfamily\arraybackslash}p{16cm}} % Apply \texttt{} (monospace)
+        }, 
+        header=true, % Display the header
+        every head row/.style={before row=\hline, after row=\hline}, % Add horizontal rule under the header
+        every last row/.style={after row=\hline}, % Add horizontal rule after the last row
+        column type={c}, % Column types for alignment
+    ]{output/ngram_generated_text.csv}
+    \caption{
+        Generated text with various N-Gram models (length of generated text = 50)\\
+        Text corpus: \texttt{In December 759 , he briefly stayed in Tonggu ( modern Gansu ) . He departed on December 24 for Chengdu ( Sichuan province ) , where he was hosted by local Prefect and fellow poet Pei Di . Du subsequently based himself in Sichuan for most of the next five years . By the autumn of that year he was in financial trouble , and sent poems begging help to various acquaintances . He was relieved by Yan Wu , a friend and former colleague who was appointed governor general at Chengdu . Despite his financial problems , this was one of the happiest and most peaceful periods of his life . Many of Du 's poems from this period are peaceful depictions of his life at " thatched hut " . In 762 , he left the city to escape a rebellion , but he returned in summer 764 when he was appointed an advisor to Yan , who was involved in campaigns against the Tibetan Empire .}
+    }
+    \label{ngram_generated_text}
+\end{table}
+
+Another limitation is due to the way the corpus is tokenised.
+Any meaning related to digits or punctuations may have been lost. 
+This means that the text generated as shown in Table \ref{ngram_generated_text} will be challenging to understand coherently.
