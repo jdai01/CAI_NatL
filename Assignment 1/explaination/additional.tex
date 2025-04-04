@@ -9,10 +9,11 @@ If the higher-order n-gram has zero counts, it is simply backed off to lower-ord
 \begin{align}
     S(w_i | w_{i-N+1:i-1}) &= \begin{cases}
         \frac{C(w_{i-N+1:i})}{C(w_{i-N+1:i-1})} & \text{if } C(w_{i-N+1:i}) > 0\\
-        \lambda \cdot S(w_i | w_{i-N+2:i-1}) & \text{otherwise}\\
-        \frac{C(W_i)}{N} & \text{if } N = 1
+        \frac{C(W_i)}{N} & \text{if } N = 1\\
+        \lambda \cdot S(w_i | w_{i-N+2:i-1}) & \text{otherwise}
     \end{cases}
 \end{align}
 
-\paragraph{Generated Text:}
+The following generated text is based on the same corpus input as described in Table \ref{ngram_generated_text}.\\
+\textbf{Generated Text:} 
 \texttt{\input{output/generated_text.txt}}

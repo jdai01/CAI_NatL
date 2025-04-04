@@ -7,15 +7,15 @@
         \pgfplotstabletypeset[
             col sep=comma,
             columns={w1,w2,pmi}, % Specify columns you want to use
-            columns/w1/.style={string type}, % Make the first column a string
-            columns/w2/.style={string type}, % Make the second column a string
+            columns/w1/.style={string type, column type={>{\ttfamily}l}},
+            columns/w2/.style={string type, column type={>{\ttfamily}l}},
             columns/pmi/.style={fixed,precision=5}, % Set the 'pmi' column to fixed-point numbers with 4 digits of precision
             header=true, % Display the header
             every head row/.style={before row=\hline, after row=\hline}, % Add horizontal rule under the header
             every last row/.style={after row=\hline}, % Add horizontal rule after the last row
-            % column type={|l|l|l}, % Add vertical lines between columns
+            column type={l}, 
         ]{output/top_30_rows.csv}
-        \caption{30 word pairs with highest pmi value}
+        \caption{30 word pairs with highest pmi value (descending order)}
         \label{top_30_rows} % Label for referencing
     \end{minipage}%
     \hfill % This adds space between the tables
@@ -24,15 +24,15 @@
         \pgfplotstabletypeset[
             col sep=comma,
             columns={w1,w2,pmi}, % Specify columns you want to use
-            columns/w1/.style={string type}, % Make the first column a string
-            columns/w2/.style={string type}, % Make the second column a string
+            columns/w1/.style={string type, column type={>{\ttfamily}l}},
+            columns/w2/.style={string type, column type={>{\ttfamily}l}},
             columns/pmi/.style={fixed,precision=5}, % Set the 'pmi' column to fixed-point numbers with 4 digits of precision
             header=true, % Display the header
             every head row/.style={before row=\hline, after row=\hline}, % Add horizontal rule under the header
             every last row/.style={after row=\hline}, % Add horizontal rule after the last row
-            % column type={|l|l|l}, % Add vertical lines between columns
+            column type={l}, 
         ]{output/bottom_30_rows.csv}
-        \caption{30 word pairs with lowest pmi value}
+        \caption{30 word pairs with lowest pmi value (ascending order)}
         \label{bottom_30_rows} % Label for referencing
     \end{minipage}
 \end{table}
