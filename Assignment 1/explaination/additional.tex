@@ -1,3 +1,18 @@
-\section{Additional Experiments}
+\section{Additional Experiments}\label{sec:backoff}
 
-\textit{Not attempted}
+\subsection{Motivation \cite{n-gram:ch3}}
+In a backoff model, how it works is that if it the n-gram has zero counts, it is backed off to $(n-1)$-gram.
+To obtain a correct probability distribution, the higher-order n-grams is discounted to save some probability mass for the lower-order n-grams. 
+Here we will use the non-discounted backoff algorithm (called stupid backoff) where there is no discount of higher-order probabilities.
+If the higher-order n-gram has zero counts, it is simply backed off to lower-order n-grams weighted by a fixed weight ($\lambda$).
+
+\begin{align}
+    S(w_i | w_{i-N+1:i-1}) &= \begin{cases}
+        \frac{C(w_{i-N+1:i})}{C(w_{i-N+1:i-1})} & \text{if } C(w_{i-N+1:i}) > 0\\
+        \lambda \cdot S(w_i | w_{i-N+2:i-1}) & \text{otherwise}\\
+        \frac{C(W_i)}{N} & \text{if } N = 1
+    \end{cases}
+\end{align}
+
+\paragraph{Generated Text:}
+\texttt{\input{output/generated_text.txt}}
