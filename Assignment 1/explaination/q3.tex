@@ -1,7 +1,7 @@
 \section{Wikipedia Language Model}
 
 \subsection{Motivation \cite{n-gram:ch3}}
-An n-gram is a sequence of n words and a a 2-gram (bigram) is a two-word sequence of words.
+An n-gram is a sequence of n words and a 2-gram (bigram) is a two-word sequence of words.
 Here, we use a 2-gram language model to solve this task.
 
 To predict the conditional probability of the next word in a bigram model, Markov assumption is applied:
@@ -49,7 +49,7 @@ It is defined as
 \end{align}
 where
 \begin{itemize}
-    \item $V$: number of unique in the corpus
+    \item $V$: number of unique words in the corpus
 \end{itemize}
 
 To finetune the model, add-k smoothing is used (further improvement from Laplace smoothing) when optimising with validation dataset. 
@@ -161,7 +161,7 @@ This suggests that the bigram model is essentially ``guessing'' the next word gi
 \subsection{Improvement using higher order N-Grams}\label{subsec:improvement-ngrams}
 It is interesting to see that with increasing $n$ for n-gram models, the perplexity increases with the exception of unigram model (Figure \ref{fig:ngram_lowest_perplexity}). 
 As the $n$-size increases, the number of possible $n$-grams increases exponentially (Figure \ref{fig:ngram_unique_prefix_count}).
-This suggests that each specific sequence of `prefix' has a lower instance, which corresponds to its probability of occurance, in the training data. 
+This suggests that each specific sequence of `prefix' has a lower instance, which corresponds to its probability of occurance in the training data. 
 This can cause the preplexity to increase tremendously with increasing $n$.
 With test data, many possible prefix sequence are not seen in the training data, which leads to the model assigning low probabilities to the unseen sequences, increasing the perplexity further.
 

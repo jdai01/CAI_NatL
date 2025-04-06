@@ -43,7 +43,7 @@ class ChiSquareGoodnessOfFit:
         critical_value = st.chi2.ppf(1 - alpha,len(self.observed)-1)
         print("Chi-square_Critical : {}".format(critical_value))
         print("*"*70)
-        if self.calculate_chi_square()>critical_value:
-            print("Reject the null hypothesis i.e, we can say that observed and expected frequencies are different")
-        else:
-            print("fail to reject the null hypothesis i.e, observed and expected frequencies are same")
+        # if self.calculate_chi_square()>critical_value:
+        #     print("Reject the null hypothesis i.e, we can say that observed and expected frequencies are different")
+        # else:
+        #     print("fail to reject the null hypothesis i.e, observed and expected frequencies are same")

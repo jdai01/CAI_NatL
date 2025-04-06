@@ -14,6 +14,12 @@ If the higher-order n-gram has zero counts, it is simply backed off to lower-ord
     \end{cases}
 \end{align}
 
-The following generated text is based on the same corpus input as described in Table \ref{ngram_generated_text}.\\
-\textbf{Generated Text:} 
+The following generated text is based on the same corpus input as described in Table \ref{ngram_generated_text}.
+
+\textbf{2-gram:} 
 \texttt{\input{output/generated_text.txt}}
+
+\textbf{5-gram:} 
+\texttt{\input{output/generated_text_5gram.txt}}
+
+Here we can see that the generated text of 2gram and 5gram model with backoff seems to be more coherent compared to the models generated text in Table \ref{ngram_generated_text}.

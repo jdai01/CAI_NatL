@@ -51,13 +51,15 @@ whereas for word-pairs with low PMI values (Table \ref{bottom_30_rows}) are pair
 
 A unigram model assumes that each word in a sentence or document is independent of all other words, 
 i.e., the probability of a word occurring is independent of the words that came before or after it.
-$$P(w_1, w_2, w_3, \dots) = \prod^{n}_{i=1} P(w_i)$$
+\begin{align}
+    P(w_1, w_2, w_3, \dots) = \prod^{n}_{i=1} P(w_i)
+\end{align}
 where $P(w_i)$ is the probability of each word $w_i$.
 
 To assess the validity of the independence assumption, 
 the conditional probabilities $P(w_i | w_1, w_2, \dots, w_{i-1})$ (observed) is calculated
 and compare to the unigram probability $P(w_i)$ (expected)
-using chi-square goodness of fit test.
+using chi-square independence test.
 
 Chi-square independence test is performed \cite{web:chi_sq_test}.
 \begin{itemize}
@@ -66,8 +68,8 @@ Chi-square independence test is performed \cite{web:chi_sq_test}.
 \end{itemize}
 
 \begin{align*}
-    \chi^2_{\text{statistics}} & = 572.4405452818747 \\
-    \chi^2_{\text{critical}} & = 57009.8446715156 \\
+    \chi^2_{\text{statistics}} & = 578.2263719632733 \\
+    \chi^2_{\text{critical}} & = 55719.52324998095 \\
     \chi^2_{\text{statistics}} & < \chi^2_{\text{critical}} & (\text{Fail to reject } H_0)
 \end{align*}
 

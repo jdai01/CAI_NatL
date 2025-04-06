@@ -6,7 +6,9 @@ Shown in accompanying Jupyter Notebook.
 
 \subsection*{Discussion on findings}
 Zipf's Law states that in a large collection of words, the frequency of any word is inversely proportional to its rank:
-$$f \propto \frac{1}{r}$$
+\begin{align}
+    f \propto \frac{1}{r}
+\end{align}
 where  
 \begin{itemize}
     \item $f$: frequency of word  
@@ -45,7 +47,8 @@ As the $H_0$ is rejected, this suggests that observed frequencies are not equal 
     \label{fig:linear_log_curve}
 \end{figure}
 
-With reference to Figure~\ref{fig:linear_log_curve}, there is a general downward trend of frequency compared to rank.
+With reference to Figure~\ref{fig:linear_log_curve}, the linear curve is not a good presentation of the Zipf's law as the frequency of occurance is happening at an exponentially decreasing rate.
+However, there is a general downward trend of frequency compared to rank in the Log-Log Curve.
 The statistical analysis shows that the observed frequency is not equal to the expected frequency, suggests that the jungle book dataset contains words that does not follow Zipf's Law significantly.
 If Zipf's Law holds, the observed line (blue) should form a straight line with a slope close to -1, as depicted by the expected line (red) in Log-Log curve. 
 However, the observed line does not follow a slope close to -1 in Log-Log curve. 
