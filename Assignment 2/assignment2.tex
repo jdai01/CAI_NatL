@@ -1,0 +1,38 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}  % For including images
+\usepackage{hyperref}  % For adding hyperlinks
+\usepackage[margin=2.5cm]{geometry} % Adjust the margin here (e.g., 2.5cm)
+\usepackage{amsmath}
+\usepackage{subcaption}
+\usepackage{pgfplotstable} 
+\usepackage{pdflscape}
+\usepackage{array}
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{references.bib}
+
+
+% Set the default path for images
+% \graphicspath{{img/}}
+
+
+\begin{document}
+
+\title{
+    Spoken and Natural Language Understanding Practical\\
+    Assignment 2
+}
+\author{Submitted by Jiahui~Dai}
+\date{\today}
+\maketitle
+
+Accompanying material: \href{file:Assignment_2.ipynb}{Assignment\_2.ipynb}
+
+\input{explaination/q1.tex}
+\input{explaination/q2.tex}
+% \input{explaination/q3.tex}
+\input{explaination/additional.tex}
+
+\newpage
+\printbibliography
+
+\end{document}
