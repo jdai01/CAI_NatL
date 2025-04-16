@@ -1,2 +1,133 @@
 \section{SMS Spam Detection}
 
+Naive Bayes Classifier is used to detect spam in this task  \cite{raschka2014naive}.
+
+\subsection{Data Preprocessing Steps}
+
+The \textbf{bag of words} model is used. 
+It treats each document as a collection of words, disregarding grammar and word order but keeping track of word frequency.
+
+Steps:
+\begin{enumerate}
+    \item Tokenisation: breaking down a text corpus into individual tokens
+    \item Stop words removal: to remove words that are relatively common and uninformative
+    \item Stemming and Lemmatization: 
+    \begin{enumerate}
+        \item Stemming: the transformation a word into its root form
+        \item Lemmatization: to obtain the grammatically correct forms of words
+    \end{enumerate}
+    \item N-grams: to group a sequence of $n$-words together. Unigram model is performed here.
+\end{enumerate}
+
+
+
+
+\subsection{Experimental Design and Methods}
+
+\begin{enumerate}
+    \item Split the data into training and test data
+    \item Train the Naive Bayes Classifier model on train data
+    % \item Optimise the model with validation data based on the validation data
+    \item Test the model with train data by calculating the probability of spam/ham on a given text, and making a decision if the text is spam or ham.
+    
+    To calculate the probability of spam/ham on a given text:
+    \begin{align}
+        P(X, w_j) &= \prod_{i=0}^{m} P(x_i | w_j)^b \cdot \left(1 - P(x_i | w_j)\right)^{(1-b)}\\
+        &= 2^{\sum_{i=0}^{m} \left[ b \cdot \log_2 P(x_i | w_j) + (1-b) \cdot \log_2 \left(1 - P(x_i | w_j)\right) \right]}\\
+        \text{with } \hat{P}(x_i, w_j) &= \frac{df_{x_i,y} + \alpha}{df_y + 2\alpha}
+    \end{align}
+    with 
+    \begin{itemize}
+        \item $b \in (0,1)$ corresponding to elements in $w_j$
+        \item $w_j \in \{\text{ham}, \text{spam}\}$
+        \item $df_{x_i,y}$: the number of documents in the training dataset that contains the feature $x_i$ and belongs to class $w_j$
+        \item $df_y$: number of documents in the training dataset that belong to class $w_j$
+        \item $\alpha$: parameters of Laplace smoothing
+    \end{itemize}
+
+    To make a decision:
+    \begin{equation}
+        \text{Decision}(X) = 
+        \begin{cases}
+            \text{spam} & \text{if } P(w = \text{spam} \mid X) \geq P(w = \text{ham} \mid X)\\
+            \text{ham} & \text{otherwise}
+        \end{cases}
+        % \label{eq:decision_rule}
+    \end{equation}
+    where
+    \begin{align}
+        P(w = \text{spam} \mid X) &= \frac{P(X | \text{spam}) \cdot P(\text{spam})}{P(X)}\\
+        P(w = \text{ham} \mid X) &= \frac{P(X | \text{ham}) \cdot P(\text{spam})}{P(X)}\\
+        \hat{P}(\text{spam}) &= \frac{\# \text{ of spam messages in training data}}{\# \text{ of all messages in training data}}\\
+        \hat{P}(\text{ham}) &= 1 - \hat{P}(\text{spam})\\
+        P(X) &= \sum_{j} P(X | w_j) \cdot P(w_j) \\
+        &= P(X | \text{spam}) \cdot P(\text{spam}) + P(X | \text{ham}) \cdot P(\text{ham})
+    \end{align}
+
+    \item Evaluate the model with its evaluation metrics.
+\end{enumerate}
+
+% * Split into training, evaluating and test data for fine tuning
+
+
+\subsection{Hyperparameters}
+
+* Laplace smoothing
+* n-grams
+
+
+
+
+\subsection{Evaluation Metric \cite{google_accuracy}}
+
+\textbf{Accuracy} is the proportion of all classifications that were correct, whether positive or negative.
+\begin{equation}
+    \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+\end{equation}
+
+\textbf{Recall} or \textbf{true positive rate (TPR)} is the proportion of all actual positives that were classified correctly as positives.
+\begin{equation}
+    \text{Recall} = \frac{TP}{TP + FN}
+\end{equation}
+
+\textbf{False positive rate (FPR)} is the proportion of all actual negatives that were classified incorrectly as positives
+\begin{equation}
+    \text{FPR} = \frac{FP}{FP + TN}
+\end{equation}
+
+\textbf{Precision} is the proportion of all the model's positive classifications that are actually positive.
+\begin{equation}
+    \text{Precision} = \frac{TP}{TP + FP}
+\end{equation}
+
+
+
+
+\subsection{Findings}
+
+\subsubsection{TF-IDF \cite{learndatasci_tfidf}}
+TF-IDF (Term Frequency-Inverse Document Frequency)  is used to evaluate how important a word is to a document in a collection or corpus.
+It helps to weigh terms based on their frequency within a document and their rarity across all documents.
+
+\begin{align}
+    TF(t,d) &= \frac{\# \text{ terms of } t \text{ appears in document } d}{\text{Total } \# \text{ of terms in document }d}\\
+    IDF(t) &= \log \left( \frac{\text{Total } \# \text{ of documents}}{\# \text{ of documents containing } t} \right)\\
+    TF-IDF(t, d) &= TF(t,d) \cdot IDF(t)
+\end{align}
+
+\textbf{Term Frequency (TF)} measures how frequently a term occurs in a document.
+
+\textbf{Inverse Document Frequency (IDF)} measures the importance of a term across all documents in the corpus.
+
+\textbf{TF-IDF} is the product of TF and IDF. It means that 
+\begin{itemize}
+    \item If a term appears frequently in a document but also in many documents, the TF will be high but the IDF will be low, lowering the overall score.
+    \item If a term appears frequently in one document but is rare across all documents, the score will be high, emphasizing the importance of that term for the document.
+\end{itemize}
+
+
+\subsection{Drawbacks}
+
+
+
+\subsection{Potential Improvements}
