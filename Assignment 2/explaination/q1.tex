@@ -38,8 +38,8 @@ Steps:
     \end{align}
     with 
     \begin{itemize}
-        \item $b \in (0,1)$ corresponding to elements in $w_j$
-        \item $w_j \in \{\text{ham}, \text{spam}\}$
+        \item $b \in (0,1)$ corresponding to elements in $w$
+        \item $w \in \{\text{ham}, \text{spam}\}$
         \item $df_{x_i,y}$: the number of documents in the training dataset that contains the feature $x_i$ and belongs to class $w_j$
         \item $df_y$: number of documents in the training dataset that belong to class $w_j$
         \item $\alpha$: parameters of Laplace smoothing
@@ -105,6 +105,10 @@ Steps:
 
 \subsection{Findings}
 
+\subsubsection{Naive Bayes Classifier Model}
+
+
+
 \subsubsection{TF-IDF \cite{learndatasci_tfidf}}
 TF-IDF (Term Frequency-Inverse Document Frequency)  is used to evaluate how important a word is to a document in a collection or corpus.
 It helps to weigh terms based on their frequency within a document and their rarity across all documents.
@@ -126,8 +130,75 @@ It helps to weigh terms based on their frequency within a document and their rar
 \end{itemize}
 
 
-\subsection{Drawbacks}
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{output/preprocessing_all.png}
+        \caption{Preprocessing: Tokenisation, stop words removal, stemming}
+        \label{fig:preprocessing_all}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{output/preprocessing_tokenize.png}
+        \caption{Preprocessing: Tokenisation only}
+        \label{fig:preprocessing_tokenize}
+    \end{subfigure}
+    \caption{TF-IDF of different preprocessing methods}
+    \label{fig:preprocessing}
+\end{figure}
 
+Figure \ref{fig:preprocessing} shows the comparison between the TF-IDF values of top 15 words of models with different preprocessing steps. 
+Model from Figure \ref{fig:preprocessing_all} is be the more ``ideal'' preprocessing step, with some TF-IDF values being high, emphasising the importance of that term for the document.
+Compared to model from Figure \ref{fig:preprocessing_tokenize}, the score tends to be on the lower side. This is seen as there are more filler words (stop words not removed), as the words appear frequently within the documents and among all documents.
+Examples of such stop words are `i', `you' and `the'.
+
+The stop words removal from the \texttt{ntlk} module may not contain all stop words as some of them are `slangs' or accronyms created by speakers. 
+
+
+\subsubsection{Spamminess}
+
+There are times where the model encounter words a few times during the learning phase, and it causes the problem of the model to trust blindly based on the information the data provide. 
+To avoid taking unreliable words into account, the spamminess formula is derived:
+\begin{equation}
+    P_s(S | x_i) = \frac{s \cdot P(S) + n \cdot P(S | x_i)}{s + n}
+\end{equation}
+where
+\begin{itemize}
+    \item $P(S)$: probability of any incoming message to be Spam
+    \item $n$: number of occurance of this word $x_i$ during the learning phase
+    \item $s$: strength given to the background information about incoming spam
+    \item $P(S | W)$: spamicity of this word
+\end{itemize}
+
+This formula is the corrected probability for the message to be spam, knowing that it contains a given word.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.8\textwidth]{output/tf-idf_spamminess.png}
+    \caption{TF-IDF against spamminess}
+    \label{fig:tfidf-spamminess}
+\end{figure}
+
+In Figure \ref{fig:tfidf-spamminess}, most words are associated with both low spamminess and TF-IDF scores. 
+This means that the words are more offen classified as ham instead of spam (not particular useful in identifying spam).
+Its low TF-IDF score also suggests that these words are uninformative or generic, as they are likely to be stopwords not removed during the preprocessing step.
+
+However, there are also words with higher TF-IDF and spamminess score. 
+For example, `call' and `u' are flagged to be an important word to determine spam compared to other words in our trained model.
+
+
+\subsection{Drawbacks \cite{bathula2023limitations}}
+
+\begin{enumerate}
+    \item Strong assumption of feature independence. This assumption may not hold true in cases where there is a strong correlation between features.
+    \item Assumption of the prior probability of each class is known and fixed. However, some prior probability may be unknown or that it changes over time, which affects the classification accuracy.
+    \item Overfitting if the training data is too small or too many irrelevant features.
+    \item Curse of dimensionality. If the number of features is large, the probability estimates become less reliable and the algorithm may not be able to capture the underlying structure of the data.
+\end{enumerate}
 
 
 \subsection{Potential Improvements}
+
+\begin{itemize}
+    \item If test data set has zero frequency issue, apply smoothing techniques like Laplace smoothing to predict the class of test data set. (Attempted)
+\end{itemize}
