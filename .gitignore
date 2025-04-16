@@ -2,10 +2,12 @@
 *__pycache__
 *.DS_Store
 
+# Ignore .venv
+*.venv
+
 # Ignore any datafiles
-*.txt
-*.raw
 *output
+*data
 
 # Ignore any LaTeX supporting files
 *.aux
