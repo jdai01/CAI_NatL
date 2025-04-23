@@ -1,6 +1,6 @@
 \section{SMS Spam Detection}
 
-Naive Bayes Classifier is used to detect spam in this task  \cite{raschka2014naive}.
+Naive Bayes Classifier is used to detect spam in this task \cite{raschka2014naive}.
 
 \subsection{Data Preprocessing Steps}
 
@@ -30,20 +30,53 @@ Steps:
     % \item Optimise the model with validation data based on the validation data
     \item Test the model with train data by calculating the probability of spam/ham on a given text, and making a decision if the text is spam or ham.
     
-    To calculate the probability of spam/ham on a given text:
+    \paragraph{Class Conditional Probability}\mbox{}\\
+    To calculate the probability of a word $x_i$ given a class $w_j$:
     \begin{align}
-        P(X, w_j) &= \prod_{i=0}^{m} P(x_i | w_j)^b \cdot \left(1 - P(x_i | w_j)\right)^{(1-b)}\\
-        &= 2^{\sum_{i=0}^{m} \left[ b \cdot \log_2 P(x_i | w_j) + (1-b) \cdot \log_2 \left(1 - P(x_i | w_j)\right) \right]}\\
-        \text{with } \hat{P}(x_i, w_j) &= \frac{df_{x_i,y} + \alpha}{df_y + 2\alpha}
+        P(x_i | w_j) &= \frac{N_{x_i, w_j}}{N_{w_j}}
     \end{align}
-    with 
+    where
     \begin{itemize}
-        \item $b \in (0,1)$ corresponding to elements in $w$
-        \item $w \in \{\text{ham}, \text{spam}\}$
-        \item $df_{x_i,y}$: the number of documents in the training dataset that contains the feature $x_i$ and belongs to class $w_j$
-        \item $df_y$: number of documents in the training dataset that belong to class $w_j$
-        \item $\alpha$: parameters of Laplace smoothing
+        \item $N_{x_i, w_j}$: Number of times word $x_i$ appears in samples from class $w_j$
+        \item $N_{w_j}$: Total count of all words in class $w_j$
     \end{itemize}
+
+    To account for words not present in the training data, Laplace smoothing is used to avoid zero probabilities.
+    To calculate the probability of a word $x_i$ given a class $w_j$:
+    \begin{align}
+        P(x_i | w_j) &= \frac{N_{x_i, w_j} + \alpha}{N_{w_j} + \alpha |V|}
+    \end{align}
+    where
+    \begin{itemize}
+        \item $\alpha$: default: 1
+        \item $|V|$: Count of unique vocabulary
+    \end{itemize}
+
+
+
+    To calculate the probability of a message $\mathbf{x}$ given a class $w_j$:
+    \begin{align}
+        P(\mathbf{x} | w_j) &= \prod_{i=1}^{d} P(x_i | w_j)\\
+        &= 2^{\sum_{i=1}^{d} \log_2 P(x_i | w_j)}
+    \end{align}
+
+
+
+
+    % To calculate the probability of spam/ham on a given text:
+    % \begin{align}
+    %     P(X, w_j) &= \prod_{i=0}^{m} P(x_i | w_j)^b \cdot \left(1 - P(x_i | w_j)\right)^{(1-b)}\\
+    %     &= 2^{\sum_{i=0}^{m} \left[ b \cdot \log_2 P(x_i | w_j) + (1-b) \cdot \log_2 \left(1 - P(x_i | w_j)\right) \right]}\\
+    %     \text{with } \hat{P}(x_i, w_j) &= \frac{df_{x_i,y} + \alpha}{df_y + 2\alpha}
+    % \end{align}
+    % with 
+    % \begin{itemize}
+    %     \item $b \in (0,1)$ corresponding to elements in $w$
+    %     \item $w \in \{\text{ham}, \text{spam}\}$
+    %     \item $df_{x_i,y}$: the number of documents in the training dataset that contains the feature $x_i$ and belongs to class $w_j$
+    %     \item $df_y$: number of documents in the training dataset that belong to class $w_j$
+    %     \item $\alpha$: parameters of Laplace smoothing
+    % \end{itemize}
 
     To make a decision:
     \begin{equation}
@@ -80,6 +113,14 @@ Steps:
 
 \subsection{Evaluation Metric \cite{google_accuracy}}
 
+\begin{itemize}
+    \item $TP$: A spam message is correctly classified as spam
+    \item $TN$: A ham (non-spam) message is correctly classified as ham
+    \item $FP$: A ham message is incorrectly classfied as spam
+    \item $FN$: A spam message is incorrectly classfied as ham
+\end{itemize}
+
+
 \textbf{Accuracy} is the proportion of all classifications that were correct, whether positive or negative.
 \begin{equation}
     \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
@@ -99,6 +140,17 @@ Steps:
 \begin{equation}
     \text{Precision} = \frac{TP}{TP + FP}
 \end{equation}
+
+\textbf{$F_\beta$ Score (F1 Score)} provides a balanced measure of a model's precision ($P$) and recall ($R$).
+\begin{equation}
+    F_\beta = (1 + \beta^2) \frac{P \cdot R}{\beta^2 \cdot P + R}
+\end{equation}
+
+\textbf{Matthews correlation coefficient} is robustness despite imbalanced dataset.
+\begin{equation}
+    MCC = \frac{TP \cdot TN - FP \cdot FN}{\sqrt{(TP + FP) \cdot (TP + FN) \cdot (TN + FP) \cdot (TN + FN)}}
+\end{equation}
+
 
 
 
