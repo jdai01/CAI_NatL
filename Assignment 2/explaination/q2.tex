@@ -1,2 +1,93 @@
 \section{Search Engine}
 
+\subsection{Construct Document Graph}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=.8\textwidth]{output/cosine-similarity-histogram.png}
+    
+    \caption{Histogram of Cosine Similarities}
+    \label{fig:cosine-similarities}
+\end{figure}
+
+Cosine similarity measures the angle between two vectors (i.e. TF-IDF vectors of SMS messages). 
+It ranges from 0.0 (where messages with no shared words) to 1.0 (where messages are identical in terms of content).
+
+Figure \ref{fig:cosine-similarities} plots the frequency of cosine similarity value between SMS messages. 
+Here we see a histogram that is right skewed towards low similarities (0.0 - 0.2), which suggests that most messages are unrelated, and that the dataset is diverse with many topics. 
+
+The similarlity threshold can be set on graph construction which affects which nodes (messages) are connected.
+In Figure \ref{fig:document-similarity-graph}, the outer ring shows the nodes of messages that have cosine similarity below the threshold and the core shows the connected nodes with edges.
+A high threshold (e.g. 0.8) will only connect highly similar messages, shown in Figure \ref{fig:document-similarity-graph-0.8}, where a low threshold (e.g. 0.2), more messages will be linked and creating a densely connected graph, shown in Figure \ref{fig:document-similarity-graph-0.2}.
+
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{.8\textwidth}
+        \centering
+        \includegraphics[width=.9\textwidth]{output/document-similarity-threshold-0.2.png} % replace with your image file
+        \caption{Threshold: 0.2}
+        \label{fig:document-similarity-graph-0.2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{.8\textwidth}
+        \centering
+        \includegraphics[width=.9\textwidth]{output/document-similarity-threshold-0.8.png} % replace with your image file
+        \caption{Threshold: 0.8}
+        \label{fig:document-similarity-graph-0.8}
+    \end{subfigure}
+    
+    \caption{Document Similarity Graph (Spam vs Ham)}
+    \label{fig:document-similarity-graph}
+\end{figure}
+
+
+
+\subsection{PageRank Algorithm}
+
+PageRank is used to rank pages (nodes) based on their importance. 
+As the edges are connected to the message nodes based on cosine similarity, only with similarity greater than threshold. 
+This means that a message node becomes important if many important or similar nodes point to it.
+
+\begin{table}[h]
+    \centering
+    \pgfplotstabletypeset[
+        col sep=tab,
+        columns/PageRank/.style={fixed,precision=20},
+        columns/Label/.style={string type},
+        columns/Message/.style={string type},
+        every head row/.style={before row=\hline, after row=\hline},
+        every last row/.style={after row=\hline},
+        column type={lll},
+    ]{output/ranked_sms_messages.csv}
+    \caption{Top 20 Messages based on PageRank with threshold of 0.8}
+    \label{top-page-rank-table} % Label for referencing
+\end{table}
+
+In Table \ref{top-page-rank-table}, these messages have high PageRank score, which means that they are well-connected in terms of context. 
+The top 20 messages are labelled `Ham', which further contribute to contextually relavent content.
+They have a common topics of casual conversation and personal updates and are usually of shorter length and straight to the point in conversations.
+
+
+\begin{landscape}
+\begin{table}[h]
+    \centering
+    \pgfplotstabletypeset[
+        col sep=tab,
+        columns/PageRank/.style={fixed,precision=20},
+        columns/Label/.style={string type},
+        columns/Message/.style={string type},
+        every head row/.style={before row=\hline, after row=\hline},
+        every last row/.style={after row=\hline},
+        column type={lll},
+    ]{output/bottom_ranked_sms_messages.csv}
+    \caption{Bottom 20 Messages based on PageRank with threshold of 0.8 (Descending order)}
+    \label{bottom-page-rank-table} % Label for referencing
+\end{table}
+
+In Table \ref{bottom-page-rank-table}, these messages have low PageRank score, which means that they are less important.
+The bottom 20 messages have some messages labelled as `Spam', which are typically standalone and contextually irrelavent, and therefore ranks lower and do not contribute to the network relavence. 
+They have a common topics of promotions, unsolicited offers, mobile phone scams and are often longer in length with many keywords to capture attention: URGENT, WON, CALL, etc.
+\end{landscape}
+
+
