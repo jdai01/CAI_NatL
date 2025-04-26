@@ -4,9 +4,6 @@ Naive Bayes Classifier is used to detect spam in this task \cite{raschka2014naiv
 
 \subsection{Data Preprocessing Steps}
 
-The \textbf{bag of words} model is used. 
-It treats each document as a collection of words, disregarding grammar and word order but keeping track of word frequency.
-
 Steps:
 \begin{enumerate}
     \item Tokenisation: breaking down a text corpus into individual tokens
@@ -16,7 +13,8 @@ Steps:
         \item Stemming: the transformation a word into its root form
         \item Lemmatization: to obtain the grammatically correct forms of words
     \end{enumerate}
-    \item N-grams: to group a sequence of $n$-words together. Unigram model is performed here.
+    % \item N-grams: to group a sequence of $n$-words together. Unigram model is performed here.
+    \item Data Splitting: Random 80-20 data split into training and test data
 \end{enumerate}
 
 
@@ -26,87 +24,43 @@ Steps:
 
 \begin{enumerate}
     \item Split the data into training and test data
-    \item Train the Naive Bayes Classifier model on train data
-    % \item Optimise the model with validation data based on the validation data
-    \item Test the model with train data by calculating the probability of spam/ham on a given text, and making a decision if the text is spam or ham.
-    
-    \paragraph{Class Conditional Probability}\mbox{}\\
-    To calculate the probability of a word $x_i$ given a class $w_j$:
-    \begin{align}
-        P(x_i | w_j) &= \frac{N_{x_i, w_j}}{N_{w_j}}
-    \end{align}
-    where
-    \begin{itemize}
-        \item $N_{x_i, w_j}$: Number of times word $x_i$ appears in samples from class $w_j$
-        \item $N_{w_j}$: Total count of all words in class $w_j$
-    \end{itemize}
+    \item Building of two different vectorisors based on its features:
+    \begin{enumerate}
+        \item \textbf{Bag-of-Words} (BoW)
+        
+        BoW treats each document as a collection of words, disregarding grammar and word order but keeping track of word frequency.
+        
+        \item \textbf{TF-IDF}
+        
+        TF-IDF (Term Frequency-Inverse Document Frequency)  is used to evaluate how important a word is to a document in a collection or corpus.
+        It helps to weigh terms based on their frequency within a document and their rarity across all documents.
 
-    To account for words not present in the training data, Laplace smoothing is used to avoid zero probabilities.
-    To calculate the probability of a word $x_i$ given a class $w_j$:
-    \begin{align}
-        P(x_i | w_j) &= \frac{N_{x_i, w_j} + \alpha}{N_{w_j} + \alpha |V|}
-    \end{align}
-    where
-    \begin{itemize}
-        \item $\alpha$: default: 1
-        \item $|V|$: Count of unique vocabulary
-    \end{itemize}
+        \begin{align}
+            TF(t,d) &= \frac{\# \text{ terms of } t \text{ appears in document } d}{\text{Total } \# \text{ of terms in document }d}\\
+            IDF(t) &= \log \left( \frac{\text{Total } \# \text{ of documents}}{\# \text{ of documents containing } t} \right)\\
+            TF-IDF(t, d) &= TF(t,d) \cdot IDF(t)
+        \end{align}
 
+        \textbf{Term Frequency (TF)} measures how frequently a term occurs in a document.
 
+        \textbf{Inverse Document Frequency (IDF)} measures the importance of a term across all documents in the corpus.
 
-    To calculate the probability of a message $\mathbf{x}$ given a class $w_j$:
-    \begin{align}
-        P(\mathbf{x} | w_j) &= \prod_{i=1}^{d} P(x_i | w_j)\\
-        &= 2^{\sum_{i=1}^{d} \log_2 P(x_i | w_j)}
-    \end{align}
+        \textbf{TF-IDF} is the product of TF and IDF. It means that 
+        \begin{itemize}
+            \item If a term appears frequently in a document but also in many documents, the TF will be high but the IDF will be low, lowering the overall score.
+            \item If a term appears frequently in one document but is rare across all documents, the score will be high, emphasizing the importance of that term for the document.
+        \end{itemize}
 
-
-
-
-    % To calculate the probability of spam/ham on a given text:
-    % \begin{align}
-    %     P(X, w_j) &= \prod_{i=0}^{m} P(x_i | w_j)^b \cdot \left(1 - P(x_i | w_j)\right)^{(1-b)}\\
-    %     &= 2^{\sum_{i=0}^{m} \left[ b \cdot \log_2 P(x_i | w_j) + (1-b) \cdot \log_2 \left(1 - P(x_i | w_j)\right) \right]}\\
-    %     \text{with } \hat{P}(x_i, w_j) &= \frac{df_{x_i,y} + \alpha}{df_y + 2\alpha}
-    % \end{align}
-    % with 
-    % \begin{itemize}
-    %     \item $b \in (0,1)$ corresponding to elements in $w$
-    %     \item $w \in \{\text{ham}, \text{spam}\}$
-    %     \item $df_{x_i,y}$: the number of documents in the training dataset that contains the feature $x_i$ and belongs to class $w_j$
-    %     \item $df_y$: number of documents in the training dataset that belong to class $w_j$
-    %     \item $\alpha$: parameters of Laplace smoothing
-    % \end{itemize}
-
-    To make a decision:
-    \begin{equation}
-        \text{Decision}(X) = 
-        \begin{cases}
-            \text{spam} & \text{if } P(w = \text{spam} \mid X) \geq P(w = \text{ham} \mid X)\\
-            \text{ham} & \text{otherwise}
-        \end{cases}
-        % \label{eq:decision_rule}
-    \end{equation}
-    where
-    \begin{align}
-        P(w = \text{spam} \mid X) &= \frac{P(X | \text{spam}) \cdot P(\text{spam})}{P(X)}\\
-        P(w = \text{ham} \mid X) &= \frac{P(X | \text{ham}) \cdot P(\text{spam})}{P(X)}\\
-        \hat{P}(\text{spam}) &= \frac{\# \text{ of spam messages in training data}}{\# \text{ of all messages in training data}}\\
-        \hat{P}(\text{ham}) &= 1 - \hat{P}(\text{spam})\\
-        P(X) &= \sum_{j} P(X | w_j) \cdot P(w_j) \\
-        &= P(X | \text{spam}) \cdot P(\text{spam}) + P(X | \text{ham}) \cdot P(\text{ham})
-    \end{align}
-
-    \item Evaluate the model with its evaluation metrics.
+    \end{enumerate}
+    \item Trained using Multinomial Naive Bayes form scikit-learn
+    \item Compare performance on the same train/test split. 
 \end{enumerate}
-
-% * Split into training, evaluating and test data for fine tuning
 
 
 \subsection{Hyperparameters}
 
-* Laplace smoothing
-* n-grams
+Laplace smoothing is used to find tune the model to obtain the best/optimal evaluation metrics. (Default: $\alpha = 1.0$)
+% * n-grams
 
 
 
@@ -131,10 +85,10 @@ Steps:
     \text{Recall} = \frac{TP}{TP + FN}
 \end{equation}
 
-\textbf{False positive rate (FPR)} is the proportion of all actual negatives that were classified incorrectly as positives
-\begin{equation}
-    \text{FPR} = \frac{FP}{FP + TN}
-\end{equation}
+% \textbf{False positive rate (FPR)} is the proportion of all actual negatives that were classified incorrectly as positives
+% \begin{equation}
+%     \text{FPR} = \frac{FP}{FP + TN}
+% \end{equation}
 
 \textbf{Precision} is the proportion of all the model's positive classifications that are actually positive.
 \begin{equation}
@@ -146,10 +100,10 @@ Steps:
     F_\beta = (1 + \beta^2) \frac{P \cdot R}{\beta^2 \cdot P + R}
 \end{equation}
 
-\textbf{Matthews correlation coefficient} is robustness despite imbalanced dataset.
-\begin{equation}
-    MCC = \frac{TP \cdot TN - FP \cdot FN}{\sqrt{(TP + FP) \cdot (TP + FN) \cdot (TN + FP) \cdot (TN + FN)}}
-\end{equation}
+% \textbf{Matthews correlation coefficient} is robustness despite imbalanced dataset.
+% \begin{equation}
+%     MCC = \frac{TP \cdot TN - FP \cdot FN}{\sqrt{(TP + FP) \cdot (TP + FN) \cdot (TN + FP) \cdot (TN + FN)}}
+% \end{equation}
 
 
 
@@ -157,100 +111,79 @@ Steps:
 
 \subsection{Findings}
 
-\subsubsection{Naive Bayes Classifier Model}
+Performance metrics is shown in Figure \ref{fig:performance-metrics}
 
-
-
-\subsubsection{TF-IDF \cite{learndatasci_tfidf}}
-TF-IDF (Term Frequency-Inverse Document Frequency)  is used to evaluate how important a word is to a document in a collection or corpus.
-It helps to weigh terms based on their frequency within a document and their rarity across all documents.
-
-\begin{align}
-    TF(t,d) &= \frac{\# \text{ terms of } t \text{ appears in document } d}{\text{Total } \# \text{ of terms in document }d}\\
-    IDF(t) &= \log \left( \frac{\text{Total } \# \text{ of documents}}{\# \text{ of documents containing } t} \right)\\
-    TF-IDF(t, d) &= TF(t,d) \cdot IDF(t)
-\end{align}
-
-\textbf{Term Frequency (TF)} measures how frequently a term occurs in a document.
-
-\textbf{Inverse Document Frequency (IDF)} measures the importance of a term across all documents in the corpus.
-
-\textbf{TF-IDF} is the product of TF and IDF. It means that 
-\begin{itemize}
-    \item If a term appears frequently in a document but also in many documents, the TF will be high but the IDF will be low, lowering the overall score.
-    \item If a term appears frequently in one document but is rare across all documents, the score will be high, emphasizing the importance of that term for the document.
-\end{itemize}
-
-
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{output/preprocessing_all.png}
-        \caption{Preprocessing: Tokenisation, stop words removal, stemming}
-        \label{fig:preprocessing_all}
+        \centering
+        \includegraphics[width=\textwidth]{output/model_accuracy.png} % replace with your image file
+        \caption{Accuracy}
+        \label{fig:Accuracy}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{output/preprocessing_tokenize.png}
-        \caption{Preprocessing: Tokenisation only}
-        \label{fig:preprocessing_tokenize}
+        \centering
+        \includegraphics[width=\textwidth]{output/model_precision.png} % replace with your image file
+        \caption{Precision}
+        \label{fig:Precision}
     \end{subfigure}
-    \caption{TF-IDF of different preprocessing methods}
-    \label{fig:preprocessing}
+    
+    \vskip\baselineskip % adds vertical space between rows
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{output/model_recall.png} % replace with your image file
+        \caption{Recall}
+        \label{fig:Recall}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{output/model_f1-score.png} % replace with your image file
+        \caption{F1 Score}
+        \label{fig:f1-score}
+    \end{subfigure}
+    
+    \caption{Performance Metrics between BoW and TF-IDF models}
+    \label{fig:performance-metrics}
 \end{figure}
 
-Figure \ref{fig:preprocessing} shows the comparison between the TF-IDF values of top 15 words of models with different preprocessing steps. 
-Model from Figure \ref{fig:preprocessing_all} is be the more ``ideal'' preprocessing step, with some TF-IDF values being high, emphasising the importance of that term for the document.
-Compared to model from Figure \ref{fig:preprocessing_tokenize}, the score tends to be on the lower side. This is seen as there are more filler words (stop words not removed), as the words appear frequently within the documents and among all documents.
-Examples of such stop words are `i', `you' and `the'.
+\paragraph{Accuracy}
+In Figure \ref{fig:Accuracy}, both models have high accuracies, which suggests that both models are able to correctly predict well and accurately the labels for the test data, whether `Ham' or `Spam'.
 
-The stop words removal from the \texttt{ntlk} module may not contain all stop words as some of them are `slangs' or accronyms created by speakers. 
+\paragraph{Precision}
+In Figure \ref{fig:Precision}, both models have high precision for both `Ham' and `Spam' labels, which suggests that both models are able to correctly well and  predict precisely the labels for the test data, on both `Ham' and `Spam'.
+
+\paragraph{Recall}
+In Figure \ref{fig:Recall}, both models have 1.0 score for recall on `Ham' and `Spam', which suggests that both models were able to correctly identify label `Ham'  and `Spam' test data.
+TF-IDF model still have lower recall for `Spam' compared to BoW model, suggesting that it is not as recallative as BoW model. 
+
+\paragraph{F1 Score}
+In Figure \ref{fig:f1-score}, both models have high F1-score on both `Ham' and `Spam', which suggests a good balance between precision and recall for `Ham' and `Spam'.
+
+\paragraph{Higher score on `Ham' compared to `Spam'}
+There is a higher score on `Ham' than `Spam' is highly due to the imbalanced data of `Ham' and `Spam'.
+There is a total of 4516 or approximately 87.4\% `Ham' labelled documents and 653 or approximately 12.6\% `Spam' labelled documents.
+
+\paragraph{Overall better performance of BoW Model}
+The BoW model has a higher corresponding metric score compared to TF-IDF model, with slightly better overall identification of `Spam' messages.
+The TF-IDF model has a slightly lower precision and lower recall for `Spam' category (which also lowers the F1 score).
 
 
-\subsubsection{Spamminess}
 
-There are times where the model encounter words a few times during the learning phase, and it causes the problem of the model to trust blindly based on the information the data provide. 
-To avoid taking unreliable words into account, the spamminess formula is derived:
-\begin{equation}
-    P_s(S | x_i) = \frac{s \cdot P(S) + n \cdot P(S | x_i)}{s + n}
-\end{equation}
-where
+
+
+\subsection{Drawbacks}
+
 \begin{itemize}
-    \item $P(S)$: probability of any incoming message to be Spam
-    \item $n$: number of occurance of this word $x_i$ during the learning phase
-    \item $s$: strength given to the background information about incoming spam
-    \item $P(S | W)$: spamicity of this word
+    \item Manual vectorization is slower than optimized libraries.
+    \item No deep contextual understanding (can't catch subtle spam phrasing).
 \end{itemize}
-
-This formula is the corrected probability for the message to be spam, knowing that it contains a given word.
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=.8\textwidth]{output/tf-idf_spamminess.png}
-    \caption{TF-IDF against spamminess}
-    \label{fig:tfidf-spamminess}
-\end{figure}
-
-In Figure \ref{fig:tfidf-spamminess}, most words are associated with both low spamminess and TF-IDF scores. 
-This means that the words are more offen classified as ham instead of spam (not particular useful in identifying spam).
-Its low TF-IDF score also suggests that these words are uninformative or generic, as they are likely to be stopwords not removed during the preprocessing step.
-
-However, there are also words with higher TF-IDF and spamminess score. 
-For example, `call' and `u' are flagged to be an important word to determine spam compared to other words in our trained model.
-
-
-\subsection{Drawbacks \cite{bathula2023limitations}}
-
-\begin{enumerate}
-    \item Strong assumption of feature independence. This assumption may not hold true in cases where there is a strong correlation between features.
-    \item Assumption of the prior probability of each class is known and fixed. However, some prior probability may be unknown or that it changes over time, which affects the classification accuracy.
-    \item Overfitting if the training data is too small or too many irrelevant features.
-    \item Curse of dimensionality. If the number of features is large, the probability estimates become less reliable and the algorithm may not be able to capture the underlying structure of the data.
-\end{enumerate}
 
 
 \subsection{Potential Improvements}
 
 \begin{itemize}
-    \item If test data set has zero frequency issue, apply smoothing techniques like Laplace smoothing to predict the class of test data set. (Attempted)
+    \item Use higher n-grams for better context (Currently only unigram)
 \end{itemize}

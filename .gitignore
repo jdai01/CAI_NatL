@@ -4,6 +4,7 @@
 
 # Ignore .venv
 *.venv
+*lib
 
 # Ignore any datafiles
 *output
