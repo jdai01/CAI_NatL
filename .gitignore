@@ -8,7 +8,6 @@
 
 # Ignore any datafiles
 *output
-*data
 
 # Ignore any LaTeX supporting files
 *.aux
