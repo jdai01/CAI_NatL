@@ -8,6 +8,7 @@
 
 # Ignore any datafiles
 *output
+*news-commentary*
 
 # Ignore any LaTeX supporting files
 *.aux
